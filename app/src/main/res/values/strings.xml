@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ProjectManager</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_data">Data</string>
+    <string name="title_advanced">Advanced</string>
+    <string name="data_header_column_1">Name</string>
+    <string name="data_header_column_2">Duration</string>
+    <string name="data_header_column_3">Required works</string>
+</resources>

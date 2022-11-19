@@ -1,40 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.data.DataFragment"
     >
-    <LinearLayout
+    <TableLayout
         android:id="@+id/data_header"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
+        android:background="@color/green"
         >
+        <TableRow>
         <TextView
             android:layout_width="0dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/data_header_column_1"
-
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             />
         <TextView
             android:layout_width="0dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/data_header_column_2"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             />
         <TextView
             android:layout_width="0dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/data_header_column_3"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             />
-    </LinearLayout>
+        </TableRow>
+    </TableLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/data_recycler_view"
@@ -42,8 +62,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/data_header"
-        android:layout_marginTop="8dp"
         />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

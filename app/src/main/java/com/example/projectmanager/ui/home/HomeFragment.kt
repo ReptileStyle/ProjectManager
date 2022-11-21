@@ -17,6 +17,7 @@ import com.example.projectmanager.R
 import com.example.projectmanager.databinding.FragmentHomeBinding
 import com.example.projectmanager.ui.data.GraphBuilder
 import dev.bandb.graphview.AbstractGraphAdapter
+import dev.bandb.graphview.decoration.edge.ArrowDecoration
 import dev.bandb.graphview.decoration.edge.StraightEdgeDecoration
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
@@ -26,6 +27,7 @@ import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager
 import dev.bandb.graphview.layouts.tree.BuchheimWalkerConfiguration
 import dev.bandb.graphview.layouts.tree.BuchheimWalkerLayoutManager
 import dev.bandb.graphview.layouts.tree.TreeEdgeDecoration
+
 
 class HomeFragment : Fragment() {
 
@@ -76,9 +78,11 @@ class HomeFragment : Fragment() {
             color = Color.BLACK
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
-            pathEffect = CornerPathEffect(10f)
+            pathEffect = CornerPathEffect(5f)
             //как уменьшить стрелочки?
         }
+
+
 
 
         // 2. Attach item decorations to draw edges
@@ -86,14 +90,7 @@ class HomeFragment : Fragment() {
 
         val myGraph = GraphBuilder()
         myGraph.createGraph()
-//        Log.d("HomeFragment",myGraph.graph.toString())
-//        val graph = Graph()
-//        val node1 = Node("Parent")
-//        val node2 = Node("Child 1")
-//        val node3 = Node("Child 2")
-//
-//        graph.addEdge(node1, node2)
-//        graph.addEdge(node1, node3)
+
 
         val adapter = GraphAdapter()
         adapter.apply {

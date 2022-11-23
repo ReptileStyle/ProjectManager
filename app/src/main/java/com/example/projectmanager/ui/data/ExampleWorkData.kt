@@ -8,11 +8,11 @@ val work3 = Work("b3",3, listOf())
 val work4 = Work("b4",6, listOf(work1))
 val work5 = Work("b5",4, listOf(work1))
 val work6 = Work("b6",1, listOf(work3))
-val work7 = Work("b7",2, listOf(work2,work5,work6))
-val work8 = Work("b8",6, listOf(work2,work5,work6))
-val work9 = Work("b9",3, listOf(work4,work7))
+val work7 = Work("b7",2, listOf(work1,work2,work3,work5,work6))
+val work8 = Work("b8",6, listOf(work1,work2,work3,work5,work6))
+val work9 = Work("b9",3, listOf(work1,work4,work7))
 val work10 = Work("b10",9, listOf(work3))
-val work11 = Work("b11",7, listOf(work2,work5,work6,work10))
+val work11 = Work("b11",7, listOf(work1,work2,work3,work5,work6,work10))
 //val work12 = Work("b12",7, listOf(work9,work7,work6,work10))
 //val work13 = Work("b13",7, listOf(work6,work10))
 //val work14 = Work("b14",7, listOf(work6,work10))
@@ -26,7 +26,7 @@ val work11 = Work("b11",7, listOf(work2,work5,work6,work10))
 //val work22 = Work("b22",7, listOf(work21))
 
 
-val exampleWorkList:List<Work> = listOf(
+val exampleWorkList:MutableList<Work> = mutableListOf(
     work1,
     work2,
     work3,

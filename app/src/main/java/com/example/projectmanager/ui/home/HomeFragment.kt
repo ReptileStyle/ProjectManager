@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectmanager.R
 import com.example.projectmanager.databinding.FragmentHomeBinding
-import com.example.projectmanager.ui.data.GraphBuilder
+import com.example.projectmanager.ui.data.GraphBuilder2
 import dev.bandb.graphview.AbstractGraphAdapter
 import dev.bandb.graphview.decoration.edge.ArrowDecoration
 import dev.bandb.graphview.decoration.edge.StraightEdgeDecoration
@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
         // 2. Attach item decorations to draw edges
         recycler.addItemDecoration(SugiyamaArrowEdgeDecoration(edgeStyle))
 
-        val myGraph = GraphBuilder()
+        val myGraph = GraphBuilder2()
         myGraph.createGraph()
 
 

@@ -2,10 +2,15 @@ package com.example.projectmanager.ui.data
 
 import android.util.Log
 import com.example.projectmanager.ui.renameme.Work
+import com.example.projectmanager.ui.renameme.toStr
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
 
-data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work: Work?)
+data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work: Work?){
+    override fun toString(): String {
+        return "src=${src.toStr()} dst=${dst.toStr()} value=${value} work=${work?.name}\n"
+    }
+}
 
 
 class GraphBuilder2 {
@@ -93,13 +98,30 @@ class GraphBuilder2 {
             }
         }
 
-
+        checkForDoubleEdges()
         createGraph(myEdges)
-        Log.d("GB2","$myEdges")
+        Log.d("GB2","${myEdges.toStr2()}")
+        Log.d("GB2",checkForDoubleEdges().toString())
         //createGraph(myEdges)
     }
     fun List<Work>.toStr():String{
         return this.joinToString ( ", " ){it.name}
+    }
+    fun MutableList<MyEdge>.toStr2():String{
+        return this.joinToString ( ", " ){it.toString()}
+    }
+    fun checkForDoubleEdges(){
+        for(i in myEdges.indices){
+            for(j in i+1 until myEdges.size){
+                if(myEdges[i].dst==myEdges[j].dst && myEdges[i].src==myEdges[j].src){
+                    nodes.add(Node("",works = myEdges[i].src.plus(myEdges[i].work!!).toList()))
+                    myEdges.add(MyEdge(myEdges[j].src,nodes.last().works,0,
+                        Work("dummyWork",0,myEdges[j].src)))
+                    myEdges[j].src=nodes.last().works
+                    Log.d("GB32","1111")
+                }
+            }
+        }
     }
 
     private fun createGraph(edges: MutableList<MyEdge>){
@@ -119,7 +141,25 @@ class GraphBuilder2 {
                 if (intersect.isNotEmpty()){
                     if(exampleWorkList.filter { it.requiredWorks==intersect }.isEmpty()){
                         nodes.add(Node("",works=intersect.toList()))
-                    }
+                    }//суда обработку двойного ребра сунуть
+
+//                    exampleWorkList.filter { it.requiredWorks.containsAll(intersect) && it.requiredWorks.size-intersect.size>=2}.forEach { work->
+//                        var amount=0
+//                        work.requiredWorks.minus(intersect).forEach { remainingWork->
+//
+//                            if(exampleWorkList.filter { it.requiredWorks.contains(remainingWork)}.minBy { it.requiredWorks.size }==work){
+//                                Log.d("GB2Ver","remaining work "+remainingWork.name)
+//                                amount+=1
+//                            }
+//
+//                        }
+//                        val worksNotProcessed=work.requiredWorks.minus(intersect).toMutableList()
+//                        for(i in 2..amount){
+//                            exampleWorkList.add(Work("dummyWork",0,intersect.plus(worksNotProcessed[0]).toList()))
+//                            nodes.add(Node("",works=intersect.plus(worksNotProcessed[0]).toList()))
+//                            worksNotProcessed.removeAt(0)
+//                        }
+//                    }
                 }
             }
         }

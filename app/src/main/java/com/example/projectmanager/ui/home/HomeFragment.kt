@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.projectmanager.R
 import com.example.projectmanager.databinding.FragmentHomeBinding
 import com.example.projectmanager.ui.data.GraphBuilder2
+import com.example.projectmanager.ui.data.GraphCalculations
 import dev.bandb.graphview.AbstractGraphAdapter
 import dev.bandb.graphview.decoration.edge.ArrowDecoration
 import dev.bandb.graphview.decoration.edge.StraightEdgeDecoration
@@ -90,6 +91,8 @@ class HomeFragment : Fragment() {
 
         val myGraph = GraphBuilder2()
         myGraph.createGraph()
+        val calculations:GraphCalculations= GraphCalculations(myGraph.myEdges,myGraph.myNodes)
+        calculations.test()
 
 
         val adapter = GraphAdapter()

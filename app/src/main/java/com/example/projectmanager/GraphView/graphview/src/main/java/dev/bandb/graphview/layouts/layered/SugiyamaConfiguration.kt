@@ -22,7 +22,7 @@ class SugiyamaConfiguration private constructor(builder: Builder) {
     }
 
     companion object {
-        const val X_SEPARATION = 100
-        const val Y_SEPARATION = 100
+        const val X_SEPARATION = 150
+        const val Y_SEPARATION = 150
     }
 }

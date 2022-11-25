@@ -10,6 +10,12 @@ data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work:
     override fun toString(): String {
         return "src=${src.toStr()} dst=${dst.toStr()} value=${value} work=${work?.name}\n"
     }
+    var _valuePessimistic:Int?=null
+    var _valueOptimistic:Int?=null
+    val valuePessimistic:Int
+        get() = if (_valuePessimistic==null) value else _valuePessimistic!!
+    val valueOptimistic:Int
+        get() = if (_valueOptimistic==null) value else _valueOptimistic!!
 }
 
 

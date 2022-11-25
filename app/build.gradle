@@ -53,5 +53,5 @@ dependencies {
     //implementation 'dev.bandb.graphview:graphview:0.8.1'
     //implementation 'com.github.ReptileStyle:GraphView:0.8.1'
     implementation'com.otaliastudios:zoomlayout:1.9.0'
-
+    implementation("org.apache.commons:commons-math3:3.6.1")
 }

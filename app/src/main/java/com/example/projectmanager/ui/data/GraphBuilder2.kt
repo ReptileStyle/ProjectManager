@@ -28,9 +28,38 @@ class GraphBuilder2 {
 
     lateinit var myNodes:List<Node>
 
+    fun processWorks(){
+        dataset.forEach {
+            work->
+            val workSet:MutableSet<Work> = mutableSetOf()
+            work.requiredWorks.forEach { secondWork->
+                workSet.addAll(secondWork.requiredWorks)
+            }
+            workSet.addAll(work.requiredWorks)
+            work.requiredWorks.removeAll { true }
+            work.requiredWorks.addAll(workSet)
+        }
+        //sorting
+        val sortedDataSet:MutableSet<Work> = mutableSetOf()
+        while(sortedDataSet.size!=dataset.size){
+            dataset.forEach { it->
+                if(sortedDataSet.containsAll(it.requiredWorks) && !sortedDataSet.contains(it)) {
+                    sortedDataSet.add(it)
+                }
+            }
+        }
+        dataset.removeAll { true }
+        dataset.addAll(sortedDataSet)
+    }
+
+
+
+
+
 
     val graph = Graph()
     fun createGraph(){
+        processWorks()
         addInitialEvents()
         processVertex()
         addListedWorks()
@@ -50,7 +79,7 @@ class GraphBuilder2 {
         for(i in 0 until vertices.size){
             nodes.add(Node("",works=vertices[i]))//добавили нужное количество вершин
         }
-        nodes.add(Node("",works=exampleWorkList))//финальная вершина, все работы выполнены
+        nodes.add(Node("",works=dataset))//финальная вершина, все работы выполнены
     }
 
     private fun addListedWorks(){
@@ -101,8 +130,8 @@ class GraphBuilder2 {
                 //ищем вершину, где максимальное количество работ, включающее currentWork, но меньше, чем у текущей вершины
                 val maxNode = nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.maxBy { it.works.size }
                // Log.d("GB2works","maxNode="+maxNode.works.toStr())
-                exampleWorkList.add(Work("dummyWork",0,maxNode.works))
-                myEdges.add(MyEdge(maxNode.works,node.works,0, exampleWorkList.last()))
+                dataset.add(Work("dummyWork",0,maxNode.works))
+                myEdges.add(MyEdge(maxNode.works,node.works,0, dataset.last()))
               // Log.d("GB22",nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.toString())
                 thisWorks.remove(currentWork)
                 thisWorks.removeAll(maxNode.works)
@@ -144,11 +173,11 @@ class GraphBuilder2 {
     // превращаем все моменты типа (b4,b7),(b5,b7) в b7,(b4,b7),(b5,b7) для корректной обработки далее
     //
     private fun processVertex(){
-        for(i in exampleWorkList.indices){
-            for(j in i until exampleWorkList.size){//ищем пересечения множеств, если оно не равно 0 и его нет, то добавляем событие
-                val intersect= exampleWorkList[i].requiredWorks.intersect(exampleWorkList[j].requiredWorks)
+        for(i in dataset.indices){
+            for(j in i until dataset.size){//ищем пересечения множеств, если оно не равно 0 и его нет, то добавляем событие
+                val intersect= dataset[i].requiredWorks.intersect(dataset[j].requiredWorks)
                 if (intersect.isNotEmpty()){
-                    if(exampleWorkList.filter { it.requiredWorks==intersect }.isEmpty()){
+                    if(dataset.filter { it.requiredWorks==intersect }.isEmpty()){
                         nodes.add(Node("",works=intersect.toList()))
                     }
                 }

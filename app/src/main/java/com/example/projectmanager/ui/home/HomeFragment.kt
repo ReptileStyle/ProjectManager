@@ -89,16 +89,14 @@ class HomeFragment : Fragment() {
         // 2. Attach item decorations to draw edges
         recycler.addItemDecoration(SugiyamaArrowEdgeDecoration(edgeStyle))
 
-        val myGraph = GraphBuilder2()
-        myGraph.createGraph()
-        val calculations:GraphCalculations= GraphCalculations(myGraph.myEdges,myGraph.myNodes)
-        calculations.test()
 
 
+        val homeViewModel =
+            ViewModelProvider(this).get(HomeViewModel::class.java)
         val adapter = GraphAdapter()
         adapter.apply {
             // 4.3 Submit the graph
-            this.submitGraph(myGraph.graph)
+            this.submitGraph( homeViewModel.myGraph.graph)
             recycler.adapter = this
         }
     }

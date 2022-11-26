@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmanager.R
+import com.example.projectmanager.ui.data.GraphBuilder2
+import com.example.projectmanager.ui.data.GraphCalculations
 import dev.bandb.graphview.AbstractGraphAdapter
 
 class GraphAdapter(): AbstractGraphAdapter<GraphAdapter.NodeViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.graph_item, parent, false)

@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.projectmanager.ui.notifications.NotificationsFragment"
+        android:name="com.example.projectmanager.ui.calculations.CalculationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/works_table_basic" />
     <fragment
         android:id="@+id/navigation_data"
         android:name="com.example.projectmanager.ui.data.DataFragment"

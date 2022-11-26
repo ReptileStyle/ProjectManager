@@ -34,7 +34,7 @@ data class EdgeData(
     val mode:Int = 0//0-обычный режим, 1-двухпараметрический, 2-трехпараметрический
 ){
     override fun toString(): String {
-        return "[value=$value, dst=${dst.node.works.toStr()},src=${src.node.works.toStr()}]"
+        return "$name=(${src.number},${dst.number})"
     }
     val reservedTime:Int
     get() = dst.lateTime!!-src.earlyTime!!-value
@@ -49,6 +49,11 @@ data class EdgeData(
         }
     val dispersion:Double
     get()= ((valueOptimistic-valuePessimistic).toDouble()/6).pow(2)
+    val earlyTime:Int
+    get()=src.earlyTime!!
+    val lateTime:Int
+    get()=dst.lateTime!!
+    var name:String=""
 }
 data class ArcInfo(
     val criticalLength:Int,
@@ -95,15 +100,21 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         }
         if(nodeData.map{it.lateTime}.contains(null)) calculateLateTimes()
     }
-    fun getCriticalPaths(node:NodeData){//в первый вызов кидаем последний элемент массива nodeData
+    fun getCriticalPaths(node:NodeData = nodeData.last()):List<Int>{//в первый вызов кидаем последний элемент массива nodeData
+        if(node==nodeData.last()) {
+            criticalPaths.clear()
+            criticalPaths.add(mutableListOf())
+            criticalPaths[0].add(nodeData.last().number)
+        }
         node.dstEdges.forEach {
-            if(it.src.number+it.value==node.earlyTime!!){
+            if(it.src.earlyTime!!+it.value==node.earlyTime!!){
                 criticalPaths[0].add(it.src.number!!)
                 getCriticalPaths(it.src)
             }
         }
+        return criticalPaths[0].reversed()
     }//искать путь не обязательно, достаточно проверить, что первый и последний нод имеют запас времени 0!!!
-    fun getArcInfo(vararg nums:Int):ArcInfo{
+    fun getArcInfo(nums:List<Int>):ArcInfo{
         //должна проверить, есть ли такая дуга
         if(nums[0]<0) throw java.lang.Exception("invalid argument")
         if(nums[0]>=nodeData.size) throw java.lang.Exception("invalid argument")
@@ -129,7 +140,10 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         return dispersion
     }//не учтено то, что может быть несколько критических путей
     fun probabilityUnderTimeOf(time:Int):Double{
-        return 0.5+0.5*laplaceFunction((time-nodeData.last().earlyTime!!).toDouble()/sqrt(getCriticalPathDispersion()))
+        if(getCriticalPathDispersion()!=0.0)
+            return 0.5+0.5*laplaceFunction((time-nodeData.last().earlyTime!!).toDouble()/sqrt(getCriticalPathDispersion()))
+        else
+            return if(time<nodeData.last().earlyTime!!) 0.0 else 1.0
     }
 
     fun timeFromProbability(prob:Double):Int{
@@ -146,13 +160,16 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         return NormalDistribution().cumulativeProbability(x)-0.5
     }
 
-    fun test(){
-        //GraphBuilder2().createGraph()
+    init {
         nodeDataInit()
         calculateEarlyTimes()
         calculateLateTimes()
+    }
 
-        Log.d("GCarc",getArcInfo(0,3,5).toString())
+    fun test(){
+        //GraphBuilder2().createGraph()
+
+       // Log.d("GCarc",getArcInfo(0,3,5).toString())
         Log.d("GC",nodeData.joinToString ("\n") {it.toString()} )
         Log.d("GC","early time :"+nodeData.map{it.earlyTime}.toString())
         Log.d("GC","late time :"+nodeData.map{it.lateTime}.toString())
@@ -200,19 +217,20 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         for(myEdge in myEdges){
             val nodeSrc=nodeData.find{it.node == nodes.find { it.works==myEdge.src }!!}!!
             val nodeDst=nodeData.find{it.node == nodes.find { it.works==myEdge.dst }!!}!!
-                edgeData.add(
-                    EdgeData(
-                        myEdge.value,
-                        myEdge.valuePessimistic,
-                        myEdge.valueOptimistic,
-                        nodeDst,
-                        nodeSrc,
-                        mode
-                    ).also { it->
-                        nodeSrc.srcEdges.add(it)
-                        nodeDst.dstEdges.add(it)
-                    }
-                )
+            edgeData.add(
+                EdgeData(
+                    myEdge.value,
+                    myEdge.valuePessimistic,
+                    myEdge.valueOptimistic,
+                    nodeDst,
+                    nodeSrc,
+                    mode
+                ).also { it->
+                    it.name=myEdge.name
+                    nodeSrc.srcEdges.add(it)
+                    nodeDst.dstEdges.add(it)
+                }
+            )
         }
     }
 

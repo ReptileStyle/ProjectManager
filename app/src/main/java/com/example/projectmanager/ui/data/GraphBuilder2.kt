@@ -16,12 +16,13 @@ data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work:
         get() = if (_valuePessimistic==null) value else _valuePessimistic!!
     val valueOptimistic:Int
         get() = if (_valueOptimistic==null) value else _valueOptimistic!!
+    var name:String="NaN"
 }
 
 
 class GraphBuilder2 {
     val nodes: MutableList<Node> = mutableListOf()
-    val dataset = exampleWorkList
+    val dataset = exampleWorkList.toMutableList()
     val myEdges:MutableList<MyEdge> = mutableListOf()
 
     var vertices=dataset.map { it.requiredWorks }.toSet().toMutableList()
@@ -50,6 +51,7 @@ class GraphBuilder2 {
         }
         dataset.removeAll { true }
         dataset.addAll(sortedDataSet)
+        vertices=dataset.map { it.requiredWorks }.toSet().toMutableList()
     }
 
 
@@ -58,19 +60,21 @@ class GraphBuilder2 {
 
 
     val graph = Graph()
-    fun createGraph(){
+    init {
+        Log.d("GB2","dataset size-"+dataset.size.toString())
         processWorks()
+        Log.d("GB2","dataset size-"+dataset.size.toString())
         addInitialEvents()
+        Log.d("GB2","nodes size-"+nodes.size.toString())
         processVertex()
+        Log.d("GB2","nodes size-"+nodes.size.toString())
         addListedWorks()
+        Log.d("GB2","dataset size-"+dataset.size.toString())
         addDummyWorks()
         checkForDoubleEdges()
         myNodes=createGraph(myEdges).toList()
-//        Log.d("GB2","${myEdges.toStr2()}")
-//        Log.d("GB2",checkForDoubleEdges().toString())
-        //createGraph(myEdges)
-       // GraphCalculations(myEdges, myNodes.toList()).test()
     }
+
 
 
 
@@ -93,6 +97,7 @@ class GraphBuilder2 {
                 myEdges[i].src=works
                 myEdges[i].value=it.duration
                 myEdges[i].work=it
+                myEdges[i].name=it.name
                 i++
             } //по src все норм, надо расставить dst
             k++
@@ -131,7 +136,7 @@ class GraphBuilder2 {
                 val maxNode = nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.maxBy { it.works.size }
                // Log.d("GB2works","maxNode="+maxNode.works.toStr())
                 dataset.add(Work("dummyWork",0,maxNode.works))
-                myEdges.add(MyEdge(maxNode.works,node.works,0, dataset.last()))
+                myEdges.add(MyEdge(maxNode.works,node.works,0, dataset.last()).apply { name="dummyWork" })
               // Log.d("GB22",nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.toString())
                 thisWorks.remove(currentWork)
                 thisWorks.removeAll(maxNode.works)
@@ -177,7 +182,7 @@ class GraphBuilder2 {
             for(j in i until dataset.size){//ищем пересечения множеств, если оно не равно 0 и его нет, то добавляем событие
                 val intersect= dataset[i].requiredWorks.intersect(dataset[j].requiredWorks)
                 if (intersect.isNotEmpty()){
-                    if(dataset.filter { it.requiredWorks==intersect }.isEmpty()){
+                    if(dataset.filter { it.requiredWorks==intersect.toMutableList() }.isEmpty()){
                         nodes.add(Node("",works=intersect.toList()))
                     }
                 }

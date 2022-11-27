@@ -11,12 +11,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectmanager.R
 import com.example.projectmanager.databinding.FragmentHomeBinding
+import com.example.projectmanager.ui.data.DataViewModel
 import com.example.projectmanager.ui.data.GraphBuilder2
 import com.example.projectmanager.ui.data.GraphCalculations
+import com.example.projectmanager.ui.renameme.toStr
 import dev.bandb.graphview.AbstractGraphAdapter
 import dev.bandb.graphview.decoration.edge.ArrowDecoration
 import dev.bandb.graphview.decoration.edge.StraightEdgeDecoration
@@ -43,16 +46,12 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("HomeFragment","created")
         val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-//        val textView: TextView = binding.textHome
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         setup()
         return root
     }
@@ -80,11 +79,7 @@ class HomeFragment : Fragment() {
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             pathEffect = CornerPathEffect(5f)
-            //как уменьшить стрелочки?
         }
-
-
-
 
         // 2. Attach item decorations to draw edges
         recycler.addItemDecoration(SugiyamaArrowEdgeDecoration(edgeStyle))
@@ -93,11 +88,21 @@ class HomeFragment : Fragment() {
 
         val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
+        val dataViewModel =activity?.viewModels<DataViewModel>()!!.value
+        Log.d("HomeFragment","graph-works = ${dataViewModel.myGraph.myEdges.size}")
         val adapter = GraphAdapter()
         adapter.apply {
             // 4.3 Submit the graph
-            this.submitGraph( homeViewModel.myGraph.graph)
+            this.submitGraph( dataViewModel.myGraph.graph)
             recycler.adapter = this
         }
+        dataViewModel.myGraph.myNodes.forEach {
+            Log.d("HomeFrag","${it.works.toStr()}")
+        }
+    }
+
+    override fun onResume() {
+        Log.d("HomeFragment","resumed")
+        super.onResume()
     }
 }

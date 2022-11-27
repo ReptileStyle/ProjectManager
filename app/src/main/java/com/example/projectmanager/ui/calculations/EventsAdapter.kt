@@ -7,12 +7,13 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmanager.R
+import com.example.projectmanager.ui.data.DataViewModel
 import com.example.projectmanager.ui.data.GraphBuilder2
 import com.example.projectmanager.ui.data.GraphCalculations
 import com.example.projectmanager.ui.data.TableAdapter
 import com.example.projectmanager.ui.renameme.Work
 
-class EventsAdapter(private val calculationsViewModel: CalculationsViewModel): RecyclerView.Adapter<EventsAdapter.ItemViewHolder>() {
+class EventsAdapter(private val calculationsViewModel: DataViewModel): RecyclerView.Adapter<EventsAdapter.ItemViewHolder>() {
     //тупо, но для начала пусть так
 
 

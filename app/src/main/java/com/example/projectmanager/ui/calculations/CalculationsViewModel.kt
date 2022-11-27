@@ -11,11 +11,11 @@ class CalculationsViewModel : ViewModel() {
     private val workList= exampleWorkList2
     fun getDataset()=workList
 
-    val myGraph = GraphBuilder2()
-    val calculator: GraphCalculations = GraphCalculations(myGraph.myEdges,myGraph.myNodes)
-    init{
-        Log.d("calcVM",myGraph.myNodes.size.toString())
-        Log.d("calcVM",calculator.nodeData.size.toString())
-        Log.d("calcVM",calculator.edgeData.size.toString())
-    }
+    //val myGraph = GraphBuilder2()
+   // val calculator: GraphCalculations = GraphCalculations(myGraph.myEdges,myGraph.myNodes)
+//    init{
+//        Log.d("calcVM",myGraph.myNodes.size.toString())
+//        Log.d("calcVM",calculator.nodeData.size.toString())
+//        Log.d("calcVM",calculator.edgeData.size.toString())
+//    }
 }

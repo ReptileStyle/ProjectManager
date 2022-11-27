@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,6 +10,54 @@
     android:orientation="vertical"
     tools:context=".ui.data.DataFragment"
     >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        >
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        android:id="@+id/radio_buttons"
+        >
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/basic_mode"
+            android:id="@+id/radio_button_basic_mode"
+            >
+
+        </RadioButton>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advanced_mode"
+            android:id="@+id/radio_button_advanced_mode"
+            >
+
+        </RadioButton>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/expert_mode"
+            android:id="@+id/radio_button_expert_mode"
+            >
+        </RadioButton>
+
+    </RadioGroup>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_add_work"
+        android:id="@+id/button_add_work"
+        />
+
     <TableLayout
         android:id="@+id/data_header"
         app:layout_constraintTop_toTopOf="parent"
@@ -15,26 +65,17 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@color/green"
+        android:layout_marginTop="0dp"
         >
-        <TableRow>
+        <TableRow
+            android:id="@+id/data_header_row_basic"
+            >
         <TextView
             android:layout_width="0dp"
             android:textAlignment="center"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/data_header_column_1"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:paddingEnd="6dp"
-            android:paddingStart="6dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:textAlignment="center"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/data_header_column_2"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
             android:paddingEnd="6dp"
@@ -53,6 +94,135 @@
             android:paddingStart="6dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             />
+        <TextView
+            android:layout_width="0dp"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/data_header_column_5"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            />
+        </TableRow>
+        <TableRow
+            android:id="@+id/data_header_row_advanced"
+            >
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_2"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_4"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_5"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+        </TableRow>
+        <TableRow
+            android:id="@+id/data_header_row_expert"
+            >
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_2"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_3"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="6dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="4dp"
+                android:text="@string/data_header_column_4"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/data_header_column_5"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                />
         </TableRow>
     </TableLayout>
 

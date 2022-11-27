@@ -20,9 +20,9 @@ data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work:
 }
 
 
-class GraphBuilder2 {
+class GraphBuilder2(workList: List<Work>) {
     val nodes: MutableList<Node> = mutableListOf()
-    val dataset = exampleWorkList.toMutableList()
+    val dataset = workList.toMutableList()
     val myEdges:MutableList<MyEdge> = mutableListOf()
 
     var vertices=dataset.map { it.requiredWorks }.toSet().toMutableList()
@@ -98,6 +98,8 @@ class GraphBuilder2 {
                 myEdges[i].value=it.duration
                 myEdges[i].work=it
                 myEdges[i].name=it.name
+                myEdges[i]._valueOptimistic=it._durationOptimistic
+                myEdges[i]._valuePessimistic=it._durationPessimistic
                 i++
             } //по src все норм, надо расставить dst
             k++

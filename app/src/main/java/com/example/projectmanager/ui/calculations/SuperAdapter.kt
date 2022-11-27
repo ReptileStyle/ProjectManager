@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmanager.R
+import com.example.projectmanager.ui.data.DataViewModel
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.NonDisposableHandle.parent
 import java.nio.file.Files.find
@@ -33,7 +34,7 @@ import java.nio.file.Files.find
 //
 //}
 
-class SuperAdapter(private val calculationsViewModel: CalculationsViewModel,val activity: FragmentActivity?):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SuperAdapter(private val calculationsViewModel: DataViewModel, val activity: FragmentActivity?, val recyclerParent: RecyclerView):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class ItemViewHolderWorksRecycler(itemView: View): RecyclerView.ViewHolder(itemView){
         val recycler:RecyclerView = itemView.findViewById(R.id.works_recycler_view)
@@ -90,22 +91,34 @@ class SuperAdapter(private val calculationsViewModel: CalculationsViewModel,val 
             holder.recycler.adapter = WorksAdapter(calculationsViewModel)
             holder.recycler.layoutManager =
                 LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
-//            holder.recycler.setOnTouchListener(object: View.OnTouchListener {
-//                override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-//                    if(p0?.id==child?.id){
-//                        if(MotionEventCompat.getActionMasked(p1)==MotionEvent.ACTION_UP){
-//                            parent.requestDisallowInterceptTouchEvent(false)
-//                        }
-//                        else{
-//                            parent.requestDisallowInterceptTouchEvent(true)
-//                        }
-//                    }
-//                    return p0?.onTouchEvent(p1)?:true
-//                }
+            holder.recycler.setOnTouchListener(object: View.OnTouchListener {
+                override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                    if (p0?.id == holder.recycler?.id) {
+                        if (MotionEventCompat.getActionMasked(p1) == MotionEvent.ACTION_UP) {
+                            recyclerParent.requestDisallowInterceptTouchEvent(false)
+                        } else {
+                            recyclerParent.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                    return p0?.onTouchEvent(p1) ?: true
+                }
+            })
         }
         if(holder is ItemViewHolderEventRecycler){
             holder.recycler.adapter=EventsAdapter(calculationsViewModel)
             holder.recycler.layoutManager= LinearLayoutManager(activity, RecyclerView.VERTICAL,false)
+            holder.recycler.setOnTouchListener(object: View.OnTouchListener {
+                override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                    if (p0?.id == holder.recycler?.id) {
+                        if (MotionEventCompat.getActionMasked(p1) == MotionEvent.ACTION_UP) {
+                            recyclerParent.requestDisallowInterceptTouchEvent(false)
+                        } else {
+                            recyclerParent.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                    return p0?.onTouchEvent(p1) ?: true
+                }
+            })
         }
         if(holder is ItemViewHolderPath){
             holder.button.setOnClickListener {

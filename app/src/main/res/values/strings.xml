@@ -6,8 +6,10 @@
     <string name="title_data">Data</string>
     <string name="title_advanced">Advanced</string>
     <string name="data_header_column_1">Name</string>
-    <string name="data_header_column_2">Duration</string>
-    <string name="data_header_column_3">Required works</string>
+    <string name="data_header_column_2">Duration Pessimistic</string>
+    <string name="data_header_column_3">Duration</string>
+    <string name="data_header_column_4">Duration Optimistic</string>
+    <string name="data_header_column_5">Required works</string>
     <string name="works_header_column_1">работа</string>
     <string name="works_header_column_2">ожидаемая длительность</string>
     <string name="works_header_column_3">дисперсия</string>
@@ -44,4 +46,11 @@
     <string name="path_length">длина:</string>
     <string name="path_path">путь:</string>
     <string name="path_path_value">0</string>
+    <string name="basic_mode">basic mode</string>
+    <string name="expert_mode">expert mode</string>
+    <string name="advanced_mode">advanced mode</string>
+    <string name="button_add_work">добавить</string>
+    <string name="dialog_add_work_header">добавить работу</string>
+    <string name="cancel">отменить</string>
+    <string name="delete_work">удалить работу?</string>
 </resources>

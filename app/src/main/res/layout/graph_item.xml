@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:background="@android:color/holo_blue_dark"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:id="@+id/graph_node_box"
+    >
 
     <TextView
         android:id="@+id/graph_node_text"

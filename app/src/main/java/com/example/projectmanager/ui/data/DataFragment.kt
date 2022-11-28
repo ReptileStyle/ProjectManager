@@ -40,21 +40,21 @@ class DataFragment : Fragment() {
         binding.radioButtons.setOnCheckedChangeListener { radioGroup, i ->
             when(i){
                 binding.radioButtonBasicMode.id->{
-                    viewModel.currentMode=1
+                    viewModel.changeMode(1)
                     recyclerView.adapter = TableAdapter(viewModel,1,requireActivity())
                     binding.dataHeaderRowBasic.visibility=View.VISIBLE
                     binding.dataHeaderRowAdvanced.visibility=View.GONE
                     binding.dataHeaderRowExpert.visibility=View.GONE
                 }
                 binding.radioButtonAdvancedMode.id->{
-                    viewModel.currentMode=2
+                    viewModel.changeMode(2)
                     recyclerView.adapter = TableAdapter(viewModel,2,requireActivity())
                     binding.dataHeaderRowBasic.visibility=View.GONE
                     binding.dataHeaderRowAdvanced.visibility=View.VISIBLE
                     binding.dataHeaderRowExpert.visibility=View.GONE
                 }
                 binding.radioButtonExpertMode.id->{
-                    viewModel.currentMode=3
+                    viewModel.changeMode(3)
                     recyclerView.adapter = TableAdapter(viewModel,3,requireActivity())
                     binding.dataHeaderRowBasic.visibility=View.GONE
                     binding.dataHeaderRowAdvanced.visibility=View.GONE

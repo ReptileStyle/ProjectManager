@@ -118,7 +118,7 @@ abstract class GraphLayoutManager internal constructor(context: Context)
         }
 
         val size = run(graph, paddingLeft.toFloat(), paddingTop.toFloat())
-        setMeasuredDimension(size.width + paddingRight + paddingLeft, size.height + paddingBottom + paddingTop)
+        setMeasuredDimension(size.width + paddingRight + paddingLeft+1000, size.height + paddingBottom + paddingTop+1000)
     }
 
     private fun positionItems(recycler: RecyclerView.Recycler,
@@ -129,7 +129,11 @@ abstract class GraphLayoutManager internal constructor(context: Context)
             adapter?.getNode(index)?.let {
                 val width = it.width
                 val height = it.height
-                val (x, y) = it.position
+                var (x, y) = it.position
+//                if(index==2){ //тут меняется позиция нода, но не ребер
+//                    x+=50
+//                    y+=50
+//                }
 
                 addView(child)
                 val childWidthSpec = makeMeasureSpec(it.width)

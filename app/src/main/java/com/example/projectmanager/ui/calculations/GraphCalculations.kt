@@ -42,13 +42,18 @@ data class EdgeData(
     get()=dst.earlyTime!!-src.lateTime!!-value
     val value:Int
         get()= when(mode){
-            0->valueAverage
-            1->round((valuePessimistic*3+valueOptimistic*2).toDouble()/5).toInt()
-            2->round((valueAverage*4+valuePessimistic+valueOptimistic).toDouble()/6).toInt()
+            1->valueAverage
+            2->round((valuePessimistic*3+valueOptimistic*2).toDouble()/5).toInt()
+            3->round((valueAverage*4+valuePessimistic+valueOptimistic).toDouble()/6).toInt()
             else -> throw java.lang.Exception("wrong mode")
         }
     val dispersion:Double
-    get()= ((valueOptimistic-valuePessimistic).toDouble()/6).pow(2)
+    get()=when(mode){
+        1->0.0
+        2,3->((valueOptimistic-valuePessimistic).toDouble()/6).pow(2)
+        else->throw java.lang.Exception("wrong mode")
+    }
+
     val earlyTime:Int
     get()=src.earlyTime!!
     val lateTime:Int
@@ -65,7 +70,7 @@ data class ArcInfo(
     get()=arcLength.toDouble()/criticalLength
 }
 
-class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode:Int=0) {
+class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode:Int=1) {
 
     //считаем наиболее ранний срок наступления событий
     val nodeData: MutableList<NodeData> = mutableListOf()
@@ -141,12 +146,19 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
     }//не учтено то, что может быть несколько критических путей
     fun probabilityUnderTimeOf(time:Int):Double{
         if(getCriticalPathDispersion()!=0.0)
-            return 0.5+0.5*laplaceFunction((time-nodeData.last().earlyTime!!).toDouble()/sqrt(getCriticalPathDispersion()))
+            return 0.5+laplaceFunction((time-nodeData.last().earlyTime!!).toDouble()/sqrt(getCriticalPathDispersion()))
         else
             return if(time<nodeData.last().earlyTime!!) 0.0 else 1.0
     }
 
     fun timeFromProbability(prob:Double):Int{
+        if(prob==1.0){
+            when(mode){
+                1->return nodeData.last().earlyTime!!
+                else->throw ArithmeticException("Infinity")
+            }
+        }
+        Log.d("GCprob",NormalDistribution().inverseCumulativeProbability(prob).toString())
         return round(nodeData.last().earlyTime!!+NormalDistribution().inverseCumulativeProbability(prob)*sqrt(getCriticalPathDispersion())).toInt()
     }
 
@@ -164,6 +176,9 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         nodeDataInit()
         calculateEarlyTimes()
         calculateLateTimes()
+        for(i in edgeData.indices){
+            Log.d("GCedge","${edgeData[i].valueOptimistic}-${edgeData[i].valueAverage}-${edgeData[i].valuePessimistic}=${edgeData[i].value}")
+        }
     }
 
     fun test(){

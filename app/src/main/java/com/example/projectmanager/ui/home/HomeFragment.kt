@@ -60,7 +60,7 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-    private fun setup(){
+    fun setup(){
         val recycler = binding.recycler
         val configuration = BuchheimWalkerConfiguration.Builder()
             .setSiblingSeparation(100)
@@ -90,7 +90,17 @@ class HomeFragment : Fragment() {
             ViewModelProvider(this).get(HomeViewModel::class.java)
         val dataViewModel =activity?.viewModels<DataViewModel>()!!.value
         Log.d("HomeFragment","graph-works = ${dataViewModel.myGraph.myEdges.size}")
-        val adapter = GraphAdapter()
+        val adapter = GraphAdapter(dataViewModel,this)
+//        for (node in dataViewModel.myGraph.graph.nodes) {
+//            node.moveY=500f
+//            node.moveX=500f
+//        }
+        for(i in dataViewModel.myGraph.graph.nodes.indices ){
+            dataViewModel.myGraph.graph.nodes[i].moveY=500f+dataViewModel.myMovements[i].y
+            dataViewModel.myGraph.graph.nodes[i].moveX=500f+dataViewModel.myMovements[i].x
+        }
+
+
         adapter.apply {
             // 4.3 Submit the graph
             this.submitGraph( dataViewModel.myGraph.graph)

@@ -5,8 +5,9 @@ import com.example.projectmanager.ui.renameme.Work
 import com.example.projectmanager.ui.renameme.toStr
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
+import kotlin.math.round
 
-data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work: Work?){
+data class MyEdge(var src:List<Work>, var dst:List<Work>, var value:Int, var work: Work?, var mode: Int=0){
     override fun toString(): String {
         return "src=${src.toStr()} dst=${dst.toStr()} value=${value} work=${work?.name}\n"
     }
@@ -17,10 +18,18 @@ data class MyEdge(var src:List<Work>,var dst:List<Work>,var value:Int, var work:
     val valueOptimistic:Int
         get() = if (_valueOptimistic==null) value else _valueOptimistic!!
     var name:String="NaN"
+
+    val valueForGraph:Int
+    get()=when(mode){
+        1->value
+        3-> round((valuePessimistic+valueOptimistic+4*value).toDouble()/6.0).toInt()
+        2-> round((3*valuePessimistic+2*valueOptimistic).toDouble()/5.0).toInt()
+        else->0
+    }
 }
 
 
-class GraphBuilder2(workList: List<Work>) {
+class GraphBuilder2(workList: List<Work>,val mode:Int=1) {
     val nodes: MutableList<Node> = mutableListOf()
     val dataset = workList.toMutableList()
     val myEdges:MutableList<MyEdge> = mutableListOf()
@@ -100,6 +109,7 @@ class GraphBuilder2(workList: List<Work>) {
                 myEdges[i].name=it.name
                 myEdges[i]._valueOptimistic=it._durationOptimistic
                 myEdges[i]._valuePessimistic=it._durationPessimistic
+                myEdges[i].mode=mode
                 i++
             } //по src все норм, надо расставить dst
             k++
@@ -157,7 +167,7 @@ class GraphBuilder2(workList: List<Work>) {
                 if(myEdges[i].dst==myEdges[j].dst && myEdges[i].src==myEdges[j].src){
                     nodes.add(Node("",works = myEdges[i].src.plus(myEdges[i].work!!).toList()))
                     myEdges.add(MyEdge(myEdges[j].src,nodes.last().works,0,
-                        Work("dummyWork",0,myEdges[j].src)))
+                        Work("dummyWork",0,myEdges[j].src)).also { it.name=="dummyWork" })
                     myEdges[j].src=nodes.last().works
                    // Log.d("GB32","1111")
                 }
@@ -172,7 +182,7 @@ class GraphBuilder2(workList: List<Work>) {
             val nodedst=nodes.find { it.works == edge.dst }!!//also filter out nodes
             myNodes=myNodes.plus(nodedst)
             myNodes=myNodes.plus(nodesrc)
-            graph.addEdge(nodesrc,nodedst,edge.value)
+            graph.addEdge(nodesrc,nodedst,edge.valueForGraph)
         }
         return myNodes
     }

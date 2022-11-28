@@ -154,8 +154,13 @@ class SuperAdapter(private val calculationsViewModel: DataViewModel, val activit
             holder.button.setOnClickListener {
                 try {
                     val prob:Double = holder.input.text?.toString()!!.toDouble()
-                    val time=calculationsViewModel.calculator.timeFromProbability(prob)
-                    holder.timeValue.text=time.toString()
+                    try {
+                        val time=calculationsViewModel.calculator.timeFromProbability(prob)
+                        holder.timeValue.text=time.toString()
+                    }catch (e:ArithmeticException){
+                        holder.timeValue.text="Infinity"
+                    }
+
                 }
                 catch (e:Exception){
                     Toast.makeText(activity,"неверный ввод", Toast.LENGTH_SHORT)

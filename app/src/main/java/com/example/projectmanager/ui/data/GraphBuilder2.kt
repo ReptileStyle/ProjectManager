@@ -128,6 +128,7 @@ class GraphBuilder2(workList: List<Work>,val mode:Int=1) {
     //если не все, то ищем нужные вершины и проводим линию с 0 duration
     private fun addDummyWorks(){
         for(node in nodes){
+            Log.d("GB2dummy","${node.works.toStr()}")
             if(node.works.size==myEdges.filter { it.dst==node.works }.size){
                 continue
             }

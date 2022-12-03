@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">ProjectManager</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Graph</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_data">Data</string>
-    <string name="title_advanced">Advanced</string>
+    <string name="title_advanced">Characteristics</string>
     <string name="data_header_column_1">Name</string>
     <string name="data_header_column_2">Duration Pessimistic</string>
     <string name="data_header_column_3">Duration</string>
@@ -42,7 +42,7 @@
     <string name="interval_final_value">[0;0]</string>
     <string name="critical_path_text">характеристики критического пути</string>
     <string name="path_lenght">длина:</string>
-    <string name="path_dispersion">дисперсия:</string>
+    <string name="path_dispersion">дисперсия в квадрате:</string>
     <string name="path_length">длина:</string>
     <string name="path_path">путь:</string>
     <string name="path_path_value">0</string>

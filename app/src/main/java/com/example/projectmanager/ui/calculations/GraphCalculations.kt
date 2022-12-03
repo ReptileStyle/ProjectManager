@@ -163,8 +163,8 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
     }
 
     fun getInterval(prob:Double):Pair<Int,Int>{
-        val x=(nodeData.last().earlyTime!!-NormalDistribution().inverseCumulativeProbability(prob)*sqrt(getCriticalPathDispersion())).toInt()
-        val y=(nodeData.last().earlyTime!!+NormalDistribution().inverseCumulativeProbability(prob)*sqrt(getCriticalPathDispersion())).toInt()
+        val x=round(nodeData.last().earlyTime!!-NormalDistribution().inverseCumulativeProbability(prob)*sqrt(getCriticalPathDispersion())).toInt()
+        val y=round(nodeData.last().earlyTime!!+NormalDistribution().inverseCumulativeProbability(prob)*sqrt(getCriticalPathDispersion())).toInt()
         return Pair(x,y)
     }
 
@@ -248,6 +248,4 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
             )
         }
     }
-
-
 }

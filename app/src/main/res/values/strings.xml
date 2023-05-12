@@ -53,4 +53,5 @@
     <string name="dialog_add_work_header">добавить работу</string>
     <string name="cancel">отменить</string>
     <string name="delete_work">удалить работу?</string>
+    <string name="optimization">Optimization</string>
 </resources>

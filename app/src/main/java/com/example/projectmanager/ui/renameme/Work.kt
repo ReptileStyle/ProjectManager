@@ -7,6 +7,7 @@ class Work(val name:String,val duration:Int,requiredWorks:List<Work>) {
     var _durationPessimistic:Int?=null
     var _durationOptimistic:Int?=null
     var requiredWorksForTable:List<Work>
+    var costToSpeedUp:Int? = null
     constructor(name:String,durationOptimistic:Int,durationAverage:Int,durationPessimistic:Int, requiredWorks:List<Work>):this(name,durationAverage,requiredWorks){
         _durationPessimistic=durationPessimistic
         _durationOptimistic=durationOptimistic

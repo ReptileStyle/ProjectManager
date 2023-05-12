@@ -21,5 +21,10 @@
         android:name="com.example.projectmanager.ui.data.DataFragment"
         android:label="DataFragment"
         tools:layout="@layout/fragment_data" />
+
+    <fragment
+        android:id="@+id/navigation_optimization"
+        android:name="com.example.projectmanager.ui.optimization.OptimizationFragment"
+        android:label="OptimizationFragment"
         />
 </navigation>

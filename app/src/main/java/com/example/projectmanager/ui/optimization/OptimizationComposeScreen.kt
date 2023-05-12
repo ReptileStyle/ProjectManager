@@ -88,7 +88,6 @@ fun OptimizationComposeScreen(
         ) {
             Text(text = "Построить график оптимизации")
         }
-
     }
 }
 

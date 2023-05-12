@@ -5,7 +5,8 @@ data class Work(
     val name: String, val duration: Int? = null, val requiredWorks: MutableList<Work>,
     var durationPessimistic:Int?=null,
     var durationOptimistic:Int?=null,
-    val costToSpeedUp: Int? = null
+    val costToSpeedUp: Int? = null,
+    val invested:Int = 0
 ) {
 //    val requiredWorks=requiredWorks.toMutableList()
 

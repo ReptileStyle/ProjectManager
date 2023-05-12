@@ -1,5 +1,6 @@
 package com.example.projectmanager.ui.optimization.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -9,15 +10,16 @@ import com.example.projectmanager.ui.renameme.Work
 @Composable
 fun WorkContainer1(
     modifier: Modifier,
-    work: Work?
+    work: Work?,
+    onClick:(()->Unit)? = null
 ) {
     if(work!=null) {
-        Row(modifier) {
+        Row(modifier.clickable(enabled = onClick!=null) { onClick?.invoke() }) {
             Text(text = work.name, modifier = Modifier.weight(2f))
             Text(text = work.durationOptimistic?.toString() ?: "", modifier = Modifier.weight(1f))
             Text(text = work.durationPessimistic?.toString() ?: "", modifier = Modifier.weight(1f))
             Text(
-                text = work.requiredWorks.joinToString(separator = ",") { it.name },
+                text = work.requiredWorks.joinToString(separator = ", ") { it.name },
                 modifier = Modifier.weight(2.5f)
             )
             Text(text = work.costToSpeedUp?.toString() ?: "", modifier = Modifier.weight(1f))

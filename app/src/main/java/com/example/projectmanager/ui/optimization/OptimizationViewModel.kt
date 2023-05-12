@@ -26,6 +26,18 @@ class OptimizationViewModel : ViewModel() {
 
 
     fun onEvent(event:OptimizationEvent){
+        when(event){
+            is OptimizationEvent.OnEditWork -> {
+                val workList = state.workList.toMutableList()
+                workList[event.index]=event.newWork
+                state = state.copy(workList = workList)
+            }
+            OptimizationEvent.OnOptimizeButtonClick -> {
 
+            }
+            is OptimizationEvent.OnBenefitChange -> {
+                state=state.copy(benefitForOneDay = event.value)
+            }
+        }
     }
 }

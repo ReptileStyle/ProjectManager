@@ -59,8 +59,8 @@ class TableAdapter(
         }
         holder.columnName.text=item.name
         holder.columnDuration.text=item.duration.toString()
-        holder.columnDurationOptimistic.text=item._durationOptimistic.toString()
-        holder.columnDurationPessimistic.text=item._durationPessimistic.toString()
+        holder.columnDurationOptimistic.text=item.durationOptimistic.toString()
+        holder.columnDurationPessimistic.text=item.durationPessimistic.toString()
         holder.columnRequiredWorks.text=item.requiredWorks.toStr()
         holder.row.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(activity)

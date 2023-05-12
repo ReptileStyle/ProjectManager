@@ -104,11 +104,11 @@ class GraphBuilder2(workList: List<Work>,val mode:Int=1) {
         vertices.forEach{ works->
             val edges = dataset.filter { it.requiredWorks==works }.forEach {
                 myEdges[i].src=works
-                myEdges[i].value=it.duration
+                myEdges[i].value=it.duration ?: 0
                 myEdges[i].work=it
                 myEdges[i].name=it.name
-                myEdges[i]._valueOptimistic=it._durationOptimistic
-                myEdges[i]._valuePessimistic=it._durationPessimistic
+                myEdges[i]._valueOptimistic=it.durationOptimistic
+                myEdges[i]._valuePessimistic=it.durationPessimistic
                 myEdges[i].mode=mode
                 i++
             } //по src все норм, надо расставить dst
@@ -148,7 +148,7 @@ class GraphBuilder2(workList: List<Work>,val mode:Int=1) {
                 //ищем вершину, где максимальное количество работ, включающее currentWork, но меньше, чем у текущей вершины
                 val maxNode = nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.maxBy { it.works.size }
                // Log.d("GB2works","maxNode="+maxNode.works.toStr())
-                dataset.add(Work("dummyWork",0,maxNode.works))
+                dataset.add(Work("dummyWork",0,requiredWorks= maxNode.works.toMutableList()))
                 myEdges.add(MyEdge(maxNode.works,node.works,0, dataset.last()).apply { name="dummyWork" })
               // Log.d("GB22",nodes.filter { it.works.contains(currentWork) && it.works.size<node.works.size }.toString())
                 thisWorks.remove(currentWork)
@@ -168,7 +168,7 @@ class GraphBuilder2(workList: List<Work>,val mode:Int=1) {
                 if(myEdges[i].dst==myEdges[j].dst && myEdges[i].src==myEdges[j].src){
                     nodes.add(Node("",works = myEdges[i].src.plus(myEdges[i].work!!).toList()))
                     myEdges.add(MyEdge(myEdges[j].src,nodes.last().works,0,
-                        Work("dummyWork",0,myEdges[j].src)).also { it.name=="dummyWork" })
+                        Work("dummyWork",0, requiredWorks =  myEdges[j].src.toMutableList())).also { it.name=="dummyWork" })
                     myEdges[j].src=nodes.last().works
                    // Log.d("GB32","1111")
                 }

@@ -1,6 +1,7 @@
 package com.example.projectmanager.ui.data
 
 import android.util.Log
+import com.example.projectmanager.ui.renameme.Work
 import com.example.projectmanager.ui.renameme.toStr
 import dev.bandb.graphview.graph.Node
 import java.nio.file.Files.find
@@ -31,7 +32,9 @@ data class EdgeData(
     val valueOptimistic:Int,
     val dst:NodeData,
     val src:NodeData,
-    val mode:Int = 0//0-обычный режим, 1-двухпараметрический, 2-трехпараметрический
+    val mode:Int = 0,//0-обычный режим, 1-двухпараметрический, 2-трехпараметрический
+    val speedUpCost:Int,
+    val work: Work
 ){
     override fun toString(): String {
         return "$name=(${src.number},${dst.number})"
@@ -59,6 +62,19 @@ data class EdgeData(
     val lateTime:Int
     get()=dst.lateTime!!
     var name:String=""
+    val srcId:Int
+    get() = src.number
+    val dstId:Int
+        get() = dst.number
+    val valueOptimization:Int
+    get() {
+//        Log.d("work","${this.name},${this.valuePessimistic},${this.invested},${invested/(work.costToSpeedUp?:Int.MAX_VALUE)}")
+        return valuePessimistic-invested/(work.costToSpeedUp?:Int.MAX_VALUE)
+    }
+    val reservedTimeOptimization:Int
+    get()=dst.lateTime!!-src.earlyTime!!-valueOptimization
+    var invested  = 0
+
 }
 data class ArcInfo(
     val criticalLength:Int,
@@ -70,40 +86,85 @@ data class ArcInfo(
     get()=arcLength.toDouble()/criticalLength
 }
 
-class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode:Int=1) {
+class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode:Int=1,val optimization:Boolean = false) {
 
     //считаем наиболее ранний срок наступления событий
     val nodeData: MutableList<NodeData> = mutableListOf()
     val edgeData: MutableList<EdgeData> = mutableListOf()
     val criticalPaths: MutableList<MutableList<Int>> = mutableListOf(mutableListOf())//может быть не один критический путь
-    fun calculateEarlyTimes(){
-        for (node in nodeData){
-            if(node.dstEdges.isEmpty()) {
-                node.earlyTime=0
-                continue
-            } //начальное событие
-            try {
-                node.earlyTime = node.dstEdges.map { it.src.earlyTime!! + it.value }.max()
-            }catch (e:java.lang.Exception){
-                continue //удивительный по своей дибильности, но рабочий алгоритм
+    fun calculateEarlyTimes(mode:Int = 0){
+
+        if(mode==0) {
+            for (node in nodeData) {
+                if (node.dstEdges.isEmpty()) {
+                    node.earlyTime = 0
+                    continue
+                } //начальное событие
+                try {
+                    node.earlyTime = node.dstEdges.map { it.src.earlyTime!! + it.value }.max()
+                } catch (e: java.lang.Exception) {
+                    continue //удивительный по своей дибильности, но рабочий алгоритм
+                }
             }
+            if (nodeData.map { it.earlyTime }.contains(null)) calculateEarlyTimes()
+        }else{
+            for (node in nodeData) {
+                if (node.dstEdges.isEmpty()) {
+                    node.earlyTime = 0
+                    continue
+                } //начальное событие
+                try {
+                    node.earlyTime = node.dstEdges.map { it.src.earlyTime!! + it.valueOptimization }.max()
+                } catch (e: java.lang.Exception) {
+                    continue //удивительный по своей дибильности, но рабочий алгоритм
+                }
+            }
+            if (nodeData.map { it.earlyTime }.contains(null)) calculateEarlyTimes(mode)
         }
-        if(nodeData.map{it.earlyTime}.contains(null)) calculateEarlyTimes()
+        Log.d("earlyTimes",nodeData.joinToString(",") { it.earlyTime.toString() })
     }
 
-    fun calculateLateTimes(){
-        for (node in nodeData){
-            if(node.srcEdges.isEmpty()) {
-                node.lateTime=nodeData.map { it.earlyTime!! }.max()
-                continue
-            } //начальное событие
-            try {
-                node.lateTime = node.srcEdges.map { it.dst.lateTime!! - it.value }.min()
-            }catch (e:java.lang.Exception){
-                continue //удивительный по своей дибильности, но рабочий алгоритм
+    fun calculateLateTimes(mode:Int = 0){
+        if(mode==0) {
+            for (node in nodeData) {
+                if (node.srcEdges.isEmpty()) {
+                    node.lateTime = nodeData.map { it.earlyTime!! }.max()
+                    continue
+                } //начальное событие
+                try {
+                    node.lateTime = node.srcEdges.map { it.dst.lateTime!! - it.value }.min()
+                } catch (e: java.lang.Exception) {
+                    continue //удивительный по своей дибильности, но рабочий алгоритм
+                }
             }
+            if (nodeData.map { it.lateTime }.contains(null)) calculateLateTimes()
+        }else{
+            for (node in nodeData) {
+                if (node.srcEdges.isEmpty()) {
+                    node.lateTime = nodeData.map { it.earlyTime!! }.max()
+                    continue
+                } //начальное событие
+                try {
+                    node.lateTime = node.srcEdges.map { it.dst.lateTime!! - it.valueOptimization }.min()
+                    Log.d("lateTimes",node.srcEdges.joinToString { "${it.name}-${it.dst.lateTime}-${it.valueOptimization}" })
+                } catch (e: java.lang.Exception) {
+                    continue //удивительный по своей дибильности, но рабочий алгоритм
+                }
+            }
+            if (nodeData.map { it.lateTime }.contains(null)) calculateLateTimes(mode)
         }
-        if(nodeData.map{it.lateTime}.contains(null)) calculateLateTimes()
+        Log.d("lateTimes",nodeData.joinToString(",") { it.lateTime.toString() })
+    }
+
+    fun recalculateReservedTimes(mode: Int = 0){
+        nodeData.map {
+            it.earlyTime=null
+            it.lateTime=null
+        }
+        calculateEarlyTimes(mode)
+        calculateLateTimes(mode)
+
+//        migrateEdges()
     }
     fun getCriticalPaths(node:NodeData = nodeData.last()):List<Int>{//в первый вызов кидаем последний элемент массива nodeData
         if(node==nodeData.last()) {
@@ -173,12 +234,18 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
     }
 
     init {
-        nodeDataInit()
-        calculateEarlyTimes()
-        calculateLateTimes()
-        for(i in edgeData.indices){
-            Log.d("GCedge","${edgeData[i].valueOptimistic}-${edgeData[i].valueAverage}-${edgeData[i].valuePessimistic}=${edgeData[i].value}")
+        if(optimization){
+            nodeDataInit()
+            calculateEarlyTimes(1)
+        }else{
+            nodeDataInit()
+            calculateEarlyTimes()
+            calculateLateTimes()
+            for(i in edgeData.indices){
+                Log.d("GCedge","${edgeData[i].valueOptimistic}-${edgeData[i].valueAverage}-${edgeData[i].valuePessimistic}=${edgeData[i].value}")
+            }
         }
+
     }
 
     fun test(){
@@ -229,6 +296,7 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         nodeData.sortBy { it.number }
     }
     fun migrateEdges(){
+        edgeData.clear()
         for(myEdge in myEdges){
             val nodeSrc=nodeData.find{it.node == nodes.find { it.works==myEdge.src }!!}!!
             val nodeDst=nodeData.find{it.node == nodes.find { it.works==myEdge.dst }!!}!!
@@ -239,7 +307,9 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
                     myEdge.valueOptimistic,
                     nodeDst,
                     nodeSrc,
-                    mode
+                    mode,
+                    myEdge?.work?.costToSpeedUp ?: Int.MAX_VALUE,
+                    myEdge.work!! //dont know about null
                 ).also { it->
                     it.name=myEdge.name
                     nodeSrc.srcEdges.add(it)

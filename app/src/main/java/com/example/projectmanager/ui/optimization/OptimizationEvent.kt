@@ -7,4 +7,5 @@ sealed class OptimizationEvent {
     data class OnEditWork(val index:Int,val newWork: Work):OptimizationEvent()
     object OnOptimizeButtonClick:OptimizationEvent()
     data class OnBenefitChange(val value:Int):OptimizationEvent()
+    data class OnChoosePlotPoint(val point:Int):OptimizationEvent()
 }

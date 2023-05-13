@@ -1,12 +1,11 @@
-package com.example.projectmanager.ui.util.new
+package com.example.projectmanager.ui.util.new2
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.projectmanager.ui.data.GraphBuilder2
 import com.example.projectmanager.ui.data.GraphCalculations
 import com.example.projectmanager.ui.renameme.Work
-import kotlin.math.min
+
+private const val TAG = "calcs2"
 
 class GraphCalculations2(
     var graphCalculations: GraphCalculations,
@@ -15,7 +14,7 @@ class GraphCalculations2(
     val criticalPath = mutableListOf<List<Int>>()
     fun optimizeByOneDay(): Pair<Int, List<Work>> {//returns cost to optimize for 1 day and list of works to speed up
         graphCalculations.edgeData.forEach {
-            Log.d("edgeData","${it.name},${it.reservedTimeOptimization}")
+            Log.d("edgeData", "${it.name},${it.reservedTimeOptimization}")
         }
         val edgesNoReservedTime =
             graphCalculations.edgeData.filter { it.reservedTimeOptimization == 0 }.toMutableList()
@@ -32,10 +31,13 @@ class GraphCalculations2(
                 val works: MutableList<Work> = mutableListOf()
                 edgesWithDstInVertexId.forEach {
                     val minCost = getMinimumCostToSpeedUp(it.srcId)
-                    if(it.name=="b3"){
-                        Log.d("calcs2","${it.work.durationPessimistic!!},${it.invested},${it.work.costToSpeedUp!!},${it.work.durationPessimistic!! - it.work.invested/it.work.costToSpeedUp!!}, ${it.work.durationOptimistic}")
+                    if (it.name == "b3") {
+                        Log.d(
+                            "calcs2",
+                            "${it.work.durationPessimistic!!},${it.invested},${it.work.costToSpeedUp!!},${it.work.durationPessimistic!! - it.work.invested / it.work.costToSpeedUp!!}, ${it.work.durationOptimistic}"
+                        )
                     }
-                    if (it.work.durationPessimistic!! - it.invested/it.work.costToSpeedUp!! != it.work.durationOptimistic && it.speedUpCost < minCost.first) {
+                    if (it.work.durationPessimistic!! - it.invested / it.work.costToSpeedUp!! != it.work.durationOptimistic && it.speedUpCost < minCost.first) {
                         sum += it.speedUpCost
                         works.add(it.work)
                     } else {
@@ -68,21 +70,64 @@ class GraphCalculations2(
                     map[it.name] = it.costToSpeedUp!!
                 }
             }
-            graphCalculations.edgeData.forEach{
-                it.invested=map[it.work.name] ?: 0
+            graphCalculations.edgeData.forEach {
+                it.invested = map[it.work.name] ?: 0
             }
 //            graphCalculations.recalculateReservedTimes(1)
-            Log.d("optimization",map.toString())
+            Log.d("optimization", map.toString())
 //            graphCalculations.calculateEarlyTimes(1)
         }
         return map
     }
 
+    fun getOptimizationGraphic(benefitOneDay: Int): List<PlotInfo1> {
+        val list: MutableList<PlotInfo1> = mutableListOf()
+        val map = firstOptimization(benefitOneDay).toMutableMap()
+        graphCalculations.recalculateReservedTimes(1)
+        list.add(
+            PlotInfo1(
+                days = graphCalculations.getEarlyTimeOfLastEvent(),
+                cost = graphCalculations.getEarlyTimeOfLastEvent() * benefitOneDay + map.map { it.value }
+                    .sum(),
+                investmentMap = map.toMap()
+            )
+        )
+        while (true) {
+            val result = optimizeByOneDay()
+
+            if (result.first == Int.MAX_VALUE) break
+            result.second.forEach {
+                if (map.containsKey(it.name)) {
+                    map[it.name] = map[it.name]!! + it.costToSpeedUp!!
+                } else {
+                    map[it.name] = it.costToSpeedUp!!
+                }
+            }
+            graphCalculations.edgeData.forEach {
+                it.invested = map[it.work.name] ?: 0
+            }
+            graphCalculations.recalculateReservedTimes(1)
+            list.add(
+                PlotInfo1(
+                    days = graphCalculations.getEarlyTimeOfLastEvent(),
+                    cost = graphCalculations.getEarlyTimeOfLastEvent() * benefitOneDay + map.map { it.value }
+                        .sum(),
+                    investmentMap = map.toMap()
+                )
+            )
+//            graphCalculations.recalculateReservedTimes(1)
+
+//            graphCalculations.calculateEarlyTimes(1)
+        }
+        return list
+    }
+
+    fun GraphCalculations.getEarlyTimeOfLastEvent(): Int {
+        return this.nodeData.maxBy { it.earlyTime ?: 0 }.earlyTime!!
+    }
 
     init {
 
 //        calculateAllCriticalPaths()
     }
 }
-
-private const val TAG = "Calculating"

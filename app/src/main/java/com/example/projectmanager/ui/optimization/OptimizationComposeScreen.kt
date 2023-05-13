@@ -1,5 +1,6 @@
 package com.example.projectmanager.ui.optimization
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,7 +30,7 @@ fun OptimizationComposeScreen(
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (lazyColumn, button, benefitField) = createRefs()
+        val (lazyColumn, button, benefitField,pointField) = createRefs()
         LazyColumn(
             modifier = Modifier
                 .heightIn(max = (screenHeight * 0.75f).dp)
@@ -67,7 +68,7 @@ fun OptimizationComposeScreen(
                 try {
                     viewModel.onEvent(OptimizationEvent.OnBenefitChange(it.toInt()))
                 } catch (e: Exception) {
-                    //nothing
+                    Log.e("asd",e.stackTrace.toString())
                 }
             },
             label = {
@@ -75,6 +76,23 @@ fun OptimizationComposeScreen(
             },
             modifier = Modifier.constrainAs(benefitField){
                 top.linkTo(lazyColumn.bottom,8.dp)
+                start.linkTo(parent.start)
+            }
+        )
+        TextField(
+            value = viewModel.state.currentPoint.toString(),
+            onValueChange = {
+                try {
+                    viewModel.onEvent(OptimizationEvent.OnChoosePlotPoint(it.toInt()))
+                } catch (e: Exception) {
+                    //nothing
+                }
+            },
+            label = {
+                Text(text = "Plot point")
+            },
+            modifier = Modifier.constrainAs(pointField){
+                top.linkTo(benefitField.bottom,8.dp)
                 start.linkTo(parent.start)
             }
         )

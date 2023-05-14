@@ -73,11 +73,12 @@ class OptimizationViewModel : ViewModel() {
 //                        }
 //                        state = state.copy(workList = workList)
 
-                val plotList = calc2.getOptimizationGraphic(benefit)
+                val plotList = calc2.getOptimizationGraphic2(benefit)
                 plotList.forEach {
                     Log.d("viewModel","${it.days} ${it.cost}")
                 }
                 state =state.copy(plotInfoList=plotList)
+//                calc2.getOptimizationGraphic2(10)
             }
         }else{
             viewModelScope.launch {

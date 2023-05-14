@@ -282,6 +282,9 @@ class GraphCalculations2(
                     edgesToCheck.add(it)
             }
         }
+        val minDays = list.minBy { it.days }
+        val minCostMinDays = list.filter { it.days==minDays.days }.minBy { it.cost }
+        list.removeAll { it.days==minDays.days && it.cost!=minCostMinDays.cost}
         return list
     }
 

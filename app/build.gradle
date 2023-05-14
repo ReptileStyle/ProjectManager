@@ -90,4 +90,5 @@ dependencies {
 
     implementation "org.jgrapht:jgrapht-core:1.5.2"
 
+    implementation "com.patrykandpatrick.vico:compose-m2:1.6.5"
 }

@@ -12,6 +12,8 @@ import com.example.projectmanager.ui.data.GraphCalculations
 import com.example.projectmanager.ui.renameme.Work
 import com.example.projectmanager.ui.util.new2.GraphCalculations2
 import com.example.projectmanager.ui.util.new2.PlotInfo1
+import com.patrykandpatrick.vico.core.entry.ChartEntryModel
+import com.patrykandpatrick.vico.core.entry.entryModelOf
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -44,15 +46,21 @@ class OptimizationViewModel : ViewModel() {
             is OptimizationEvent.OnBenefitChange -> {
                 state = state.copy(benefitForOneDay = event.value)
             }
-            is OptimizationEvent.OnChoosePlotPoint ->{
-                val map = state.plotInfoList[event.point].investmentMap
-                val workList = state.workList
-                Log.d("viewModel", map.toString())
+            OptimizationEvent.OnHidePlotButtonClick -> {
+                state=state.copy(isPlotVisible = false)
+            }
+            OptimizationEvent.OnShowPlotButtonClick -> {
+                state=state.copy(isPlotVisible = true)
+            }
+            is OptimizationEvent.OnSelectInvestmentVariant ->{
+                val workList = state.workList.toMutableList()
+                val map = state.plotInfoList[event.index].investmentMap
                 workList.forEach {
                     val value = map[it.name] ?: 0
-                    it.invested = value.also { Log.d("viewModel", value.toString()) }
+                    it.invested =
+                        value.also { Log.d("viewModel", value.toString()) }
                 }
-                state = state.copy(workList = workList, currentPoint = event.point)
+                state = state.copy(workList = workList, isPlotVisible = false, selectedVariant = event.index)
             }
         }
     }
@@ -74,10 +82,14 @@ class OptimizationViewModel : ViewModel() {
 //                        state = state.copy(workList = workList)
 
                 val plotList = calc2.getOptimizationGraphic2(benefit)
+                val chartEntryModel = entryModelOf(
+                     *(plotList.map { Pair(it.days,it.cost) }.toTypedArray())
+                )
                 plotList.forEach {
                     Log.d("viewModel","${it.days} ${it.cost}")
                 }
-                state =state.copy(plotInfoList=plotList)
+
+                state =state.copy(plotInfoList=plotList, plotModel = chartEntryModel, isPlotVisible = true)
 //                calc2.getOptimizationGraphic2(10)
             }
         }else{

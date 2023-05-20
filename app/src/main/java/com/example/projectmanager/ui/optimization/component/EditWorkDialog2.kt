@@ -12,47 +12,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
 import com.example.projectmanager.ui.renameme.Work
 
 @Composable
 fun EditWorkDialog2(
-    work: Triple<Int?, Int, Int?>,
-    onConfirm: (Triple<Int?, Int, Int?>) -> Unit,
+    work: MonteCarloWork,
+    onConfirm: (MonteCarloWork) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var currentWork by remember {
-        mutableStateOf(work)
+    var workWidth by remember {
+        mutableStateOf(work.width?.toString() ?: "")
     }
     val context = LocalContext.current
     Dialog(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.background(color = Color.White)) {
             TextField(
-                value = currentWork.first?.toString() ?: "",
+                value = workWidth,
                 onValueChange = {
-                    try {
-                        currentWork = currentWork.copy(first = it.toInt())
-                    } catch (e: Exception) {
-                        //nothing
-                    }
+                    workWidth = it
                 },
                 label = { Text(text = "Время опт.") }
             )
-            TextField(
-                value = currentWork.third?.toString() ?: "",
-                onValueChange = {
-                    try {
-                        currentWork = currentWork.copy(third = it.toInt())
-                    } catch (e: Exception) {
-                        //nothing
-                    }
-                },
-                label = { Text(text = "Время пес.") }
-            )
+
             TextButton(onClick = {
-                if (validateWork(currentWork)) {
-                    onConfirm(currentWork)
+                try {
+                    onConfirm(
+                        MonteCarloWork(
+                            name = work.name,
+                            duration = work.duration,
+                            workWidth.toDouble()
+                        )
+                    )
                     onDismiss()
-                } else {
+                } catch (e: Exception) {
                     Toast.makeText(context, "Неверное заполнение данных", Toast.LENGTH_SHORT).show()
                 }
             }, modifier = Modifier.fillMaxWidth()) {
@@ -62,11 +55,3 @@ fun EditWorkDialog2(
     }
 }
 
-private fun validateWork(work: Triple<Int?, Int, Int?>): Boolean {
-    when {
-        work.first == null -> return true
-        work.third == null -> return true
-        work.first!! >= work.third!! -> return false
-        else -> return true
-    }
-}

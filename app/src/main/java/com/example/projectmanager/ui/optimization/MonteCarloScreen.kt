@@ -1,9 +1,6 @@
 package com.example.projectmanager.ui.optimization
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -19,15 +16,26 @@ import com.example.projectmanager.ui.optimization.component.EditWorkDialog
 import com.example.projectmanager.ui.optimization.component.EditWorkDialog2
 import com.example.projectmanager.ui.optimization.component.WorkContainer1
 import com.example.projectmanager.ui.optimization.component.WorkContainer2
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
+import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.axis.horizontal.HorizontalAxis
+import java.text.DecimalFormat
 
 @Composable
 fun MonteCarloScreen(
     state: OptimizationState,
     onEvent: (OptimizationEvent) -> Unit
 ) {
+    val formatter = remember {
+        DecimalFormat("#,###.##")
+    }
     val screenHeight = LocalConfiguration.current.screenHeightDp
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (lazyColumn, button, benefitField, costField, showPlotButton) = createRefs()
+        val (lazyColumn, plot, showPlotButton) = createRefs()
         LazyColumn(modifier = Modifier
             .heightIn(max = (screenHeight * 0.75f).dp)
             .constrainAs(lazyColumn) {
@@ -39,7 +47,7 @@ fun MonteCarloScreen(
                 WorkContainer2(
                     modifier = Modifier.fillMaxWidth(),
                     work = null,
-                    monteCarloInfo = Triple(0, 0, 0)
+                    monteCarloInfo = MonteCarloWork("", 0,0.0)
                 )
             }
             itemsIndexed(state.workList) { index, work ->
@@ -67,6 +75,25 @@ fun MonteCarloScreen(
                 )
                 Divider()
             }
+        }
+        if(state.monteCarloPlotInfo!=null) {
+            Chart(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .constrainAs(plot) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(lazyColumn.bottom, 40.dp)
+                    },
+                chart = columnChart(),
+                model = state.monteCarloPlotInfo,
+                startAxis = startAxis(valueFormatter = { value, chartValues ->
+                    formatter.format(value)
+                }),
+                bottomAxis = bottomAxis(
+                    tickLength = 2.dp,
+                )
+            )
         }
         Button(
             modifier = Modifier.constrainAs(showPlotButton) {

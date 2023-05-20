@@ -1,5 +1,6 @@
 package com.example.projectmanager.ui.optimization
 
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
 import com.example.projectmanager.ui.renameme.Work
 import com.example.projectmanager.ui.util.new2.PlotInfo1
 import com.patrykandpatrick.vico.core.entry.ChartEntryModel
@@ -12,5 +13,6 @@ data class OptimizationState(
     val plotModel:ChartEntryModel? = null,
     val isPlotVisible:Boolean = false,
     val isMonteCarlo:Boolean = false,
-    val workCostsMonteCarlo:List<Triple<Int?,Int,Int?>> = listOf()
+    val workCostsMonteCarlo:List<MonteCarloWork> = listOf(),
+    val monteCarloPlotInfo: ChartEntryModel? = null
 )

@@ -25,6 +25,7 @@ data class NodeData(
     val reservedTime:Int
     get() = lateTime!!-earlyTime!!
     var number: Int = -1
+    var earlyTimeMonteCarlo:Double? = null
 }
 data class EdgeData(
     val valueAverage:Int,
@@ -74,6 +75,7 @@ data class EdgeData(
     val reservedTimeOptimization:Int
     get()=dst.lateTime!!-src.earlyTime!!-valueOptimization
     var invested  = 0
+    var monteCarloDuration = 0.0
 
 }
 data class ArcInfo(
@@ -114,6 +116,10 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
                     continue
                 } //начальное событие
                 try {
+                    Log.d("critical",node.number.toString())
+                    Log.d("critical",node.dstEdges.joinToString { it.name })
+                    Log.d("critical",node.dstEdges.joinToString { it.monteCarloDuration.toString() })
+
                     node.earlyTime = node.dstEdges.map { it.src.earlyTime!! + it.valueOptimization }.max()
                 } catch (e: java.lang.Exception) {
                     continue //удивительный по своей дибильности, но рабочий алгоритм
@@ -123,7 +129,21 @@ class GraphCalculations(val myEdges: List<MyEdge>, val nodes:List<Node>,val mode
         }
         Log.d("earlyTimes",nodeData.joinToString(",") { it.earlyTime.toString() })
     }
+    fun calculateMonteCarloEarlyTime(){
 
+        for (node in nodeData) {
+            if (node.dstEdges.isEmpty()) {
+                node.earlyTimeMonteCarlo = 0.0
+                continue
+            } //начальное событие
+            try {
+                node.earlyTimeMonteCarlo = node.dstEdges.map { it.src.earlyTimeMonteCarlo!! + it.monteCarloDuration!! }.max()
+            } catch (e: java.lang.Exception) {
+                continue //удивительный по своей дибильности, но рабочий алгоритм
+            }
+        }
+        if (nodeData.map { it.earlyTimeMonteCarlo }.contains(null)) calculateMonteCarloEarlyTime()
+    }
     fun calculateLateTimes(mode:Int = 0){
         if(mode==0) {
             for (node in nodeData) {

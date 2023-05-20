@@ -4,16 +4,22 @@ import android.util.Log
 import com.example.projectmanager.ui.data.EdgeData
 import com.example.projectmanager.ui.data.GraphBuilder2
 import com.example.projectmanager.ui.data.GraphCalculations
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
 import com.example.projectmanager.ui.renameme.Work
 import dev.bandb.graphview.graph.Edge
 import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.graph.Node
+import org.apache.commons.math3.distribution.BetaDistribution
+import org.apache.commons.math3.special.Gamma
 import org.jgrapht.alg.shortestpath.AllDirectedPaths
 import org.jgrapht.graph.DefaultDirectedWeightedGraph
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedGraph
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import java.lang.Math.min
+import java.lang.Math.round
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 private const val TAG = "calcs2"
 
@@ -104,7 +110,10 @@ class GraphCalculations2(
             .forEach { edge ->
                 val weightedEdge = DefaultWeightedEdge()
                 graph.addEdge(edge.src.number, edge.dst.number, weightedEdge)
-                Log.d("newgraphcalc","${edge.work.name},${edge.invested},${edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp!! != edge.work.durationOptimistic} ")
+                Log.d(
+                    "newgraphcalc",
+                    "${edge.work.name},${edge.invested},${edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp!! != edge.work.durationOptimistic} "
+                )
                 graph.setEdgeWeight(
                     weightedEdge,
                     if (edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp != edge.work.durationOptimistic)
@@ -114,9 +123,9 @@ class GraphCalculations2(
         return graph
     }
 
-    fun getOptimizationGraphic2(benefitOneDay: Int):List<PlotInfo1> {
+    fun getOptimizationGraphic2(benefitOneDay: Int): List<PlotInfo1> {
         val list: MutableList<PlotInfo1> = mutableListOf()
-        val map = mutableMapOf<String,Int>() //save optimization config
+        val map = mutableMapOf<String, Int>() //save optimization config
         var criticalGraph = graphCalculations.getCriticalPathsGraph()
         val startId = criticalGraph.vertexSet().minBy { it }
         val finishId = criticalGraph.vertexSet().maxBy { it }
@@ -150,8 +159,8 @@ class GraphCalculations2(
             }
             return edgeList.minByOrNull {
                 var sum = 0
-                for(edge in it){
-                    if( criticalGraph.getEdgeWeight(edge).toInt() == Int.MAX_VALUE){
+                for (edge in it) {
+                    if (criticalGraph.getEdgeWeight(edge).toInt() == Int.MAX_VALUE) {
                         sum = Int.MAX_VALUE
                         break
                     }
@@ -160,17 +169,18 @@ class GraphCalculations2(
                 sum
             } ?: listOf()
         }
-        while (true){
+        while (true) {
             val result = getMinimalCostEdgeList(edgesToCheck)
-            if(result.sumOf { criticalGraph.getEdgeWeight(it) } >= Int.MAX_VALUE || result.isEmpty()) break
+            if (result.sumOf { criticalGraph.getEdgeWeight(it) } >= Int.MAX_VALUE || result.isEmpty()) break
             //apply changes to graph
             result.forEach {
                 val src = criticalGraph.getEdgeSource(it)
                 val dst = criticalGraph.getEdgeTarget(it)
-                val name = graphCalculations.edgeData.find { it.src.number==src && it.dst.number==dst }!!.work.name
-                if(map.containsKey(name)){
+                val name =
+                    graphCalculations.edgeData.find { it.src.number == src && it.dst.number == dst }!!.work.name
+                if (map.containsKey(name)) {
                     map[name] = map[name]!! + criticalGraph.getEdgeWeight(it).toInt()
-                }else{
+                } else {
                     map[name] = criticalGraph.getEdgeWeight(it).toInt()
                 }
             }
@@ -186,7 +196,7 @@ class GraphCalculations2(
                     investmentMap = map.toMap()
                 )
             )
-            Log.d("newgraphcalc",map.toString())
+            Log.d("newgraphcalc", map.toString())
             criticalGraph = graphCalculations.getCriticalPathsGraph()
             allPaths =
                 AllDirectedPaths(criticalGraph).getAllPaths(
@@ -197,15 +207,61 @@ class GraphCalculations2(
                 )
             edgesToCheck.clear()
             criticalGraph.edgeSet().forEach {
-                if(criticalGraph.getEdgeWeight(it).toInt()<Int.MAX_VALUE)
+                if (criticalGraph.getEdgeWeight(it).toInt() < Int.MAX_VALUE)
                     edgesToCheck.add(it)
             }
         }
         val minDays = list.minBy { it.days }
-        val minCostMinDays = list.filter { it.days==minDays.days }.minBy { it.cost }
-        list.removeAll { it.days==minDays.days && it.cost!=minCostMinDays.cost}
+        val minCostMinDays = list.filter { it.days == minDays.days }.minBy { it.cost }
+        list.removeAll { it.days == minDays.days && it.cost != minCostMinDays.cost }
         return list
     }
+
+    private val betaAlpha = 3 + sqrt(2.0)
+    private val betaBeta = 3 - sqrt(2.0)
+    fun GraphCalculations.getEarlyTimeMonteCarloOfLastEvent(): Double {
+        return this.nodeData.maxBy { it.earlyTimeMonteCarlo ?: 0.0 }.earlyTimeMonteCarlo!!
+    }
+
+    fun buildMonteCarloHist(monteCarloInfo: List<MonteCarloWork>): List<Pair<Int, Double>> {
+        //generating sample
+        val projectDurations = mutableListOf<Double>()
+
+        for (i in 1..1000) {
+            val workDurations: MutableMap<String, Double> = mutableMapOf()
+            monteCarloInfo.forEach {
+                workDurations[it.name] = it.duration.toDouble() + it.width!! * (BetaDistribution(betaAlpha,betaBeta).sample() - 0.85355339)
+            } //вычесть моду распределения
+            graphCalculations.nodeData.forEach {
+                it.earlyTimeMonteCarlo = null
+            }
+            graphCalculations.edgeData.forEach { edge ->
+                edge.monteCarloDuration = workDurations[edge.name] ?: 0.0
+            }
+            graphCalculations.calculateMonteCarloEarlyTime()
+            projectDurations.add(graphCalculations.getEarlyTimeMonteCarloOfLastEvent().also { Log.d("generator",it.toString()) })
+        }
+        val rounded = projectDurations.map {
+            it.roundToInt()
+        }
+        val countMap = mutableMapOf<Int, Int>()
+        rounded.forEach {
+            countMap[it] = (countMap[it] ?: 0) + 1
+        }
+        Log.d("calc2",rounded.toString())
+        return countMap.toList().map { Pair(it.first,it.second.toDouble()/1000.0) }
+    }
+
+
+//    fun customDensityBetaDistribution(t: Double, min: Double, max: Double): Double {
+//        if (t < min) return 0.0
+//        if (t > max) return 0.0
+//        return (Math.pow(t - min, betaAlpha) * Math.pow(max - t, betaBeta) / Math.pow(
+//            max - min,
+//            betaBeta + betaAlpha - 1
+//        )/ 0.07682109595) //precalculated b(betaAlpha,betaBeta)
+//    }
+
 
     init {
 

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectmanager.ui.core.UiEvent
 import com.example.projectmanager.ui.data.GraphBuilder2
 import com.example.projectmanager.ui.data.GraphCalculations
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
 import com.example.projectmanager.ui.renameme.Work
 import com.example.projectmanager.ui.util.new2.GraphCalculations2
 import com.example.projectmanager.ui.util.new2.PlotInfo1
@@ -64,10 +65,10 @@ class OptimizationViewModel : ViewModel() {
                     selectedVariant = event.index
                 )
                 state = state.copy(workCostsMonteCarlo = workList.map {
-                    Triple(
-                        null,
+                    MonteCarloWork(
+                        name=it.name,
                         it.durationPessimistic!! - it.invested/it.costToSpeedUp!!,
-                        null
+                        5.0
                     )
                 })
             }
@@ -75,7 +76,17 @@ class OptimizationViewModel : ViewModel() {
                 state = state.copy(isMonteCarlo = true)
             }
             OptimizationEvent.OnBuildMonteCarloPlot -> {
-                //TODO
+                viewModelScope.launch {
+                    val graph = GraphBuilder2(state.workList)
+                    val calculator =
+                        GraphCalculations(myEdges = graph.myEdges, nodes = graph.myNodes)
+                    val calc2 = GraphCalculations2(graphCalculations = calculator, graph)
+                    val plotInfo = calc2.buildMonteCarloHist(state.workCostsMonteCarlo)
+                    val model = entryModelOf(
+                        *(plotInfo.toTypedArray())
+                    )
+                    state=state.copy(monteCarloPlotInfo = model)
+                }
             }
             is OptimizationEvent.OnEditMonteCarlo -> {
                 val monteCarloList = state.workCostsMonteCarlo.toMutableList()

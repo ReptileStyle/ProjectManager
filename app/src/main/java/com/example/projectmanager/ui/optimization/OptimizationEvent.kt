@@ -1,5 +1,6 @@
 package com.example.projectmanager.ui.optimization
 
+import com.example.projectmanager.ui.optimization.component.model.MonteCarloWork
 import com.example.projectmanager.ui.renameme.Work
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
@@ -16,6 +17,6 @@ sealed class OptimizationEvent {
 
     object OnBuildMonteCarloPlot:OptimizationEvent()
 
-    data class OnEditMonteCarlo(val index: Int,val value:Triple<Int?,Int,Int?>):OptimizationEvent()
+    data class OnEditMonteCarlo(val index: Int,val value:MonteCarloWork):OptimizationEvent()
 
 }

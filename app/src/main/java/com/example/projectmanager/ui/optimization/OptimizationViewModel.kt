@@ -31,8 +31,6 @@ class OptimizationViewModel : ViewModel() {
     }
 
 
-
-
     fun onEvent(event: OptimizationEvent) {
         when (event) {
             is OptimizationEvent.OnEditWork -> {
@@ -41,18 +39,18 @@ class OptimizationViewModel : ViewModel() {
                 state = state.copy(workList = workList)
             }
             OptimizationEvent.OnOptimizeButtonClick -> {
-              optimize()
+                optimize()
             }
             is OptimizationEvent.OnBenefitChange -> {
                 state = state.copy(benefitForOneDay = event.value)
             }
             OptimizationEvent.OnHidePlotButtonClick -> {
-                state=state.copy(isPlotVisible = false)
+                state = state.copy(isPlotVisible = false)
             }
             OptimizationEvent.OnShowPlotButtonClick -> {
-                state=state.copy(isPlotVisible = true)
+                state = state.copy(isPlotVisible = true)
             }
-            is OptimizationEvent.OnSelectInvestmentVariant ->{
+            is OptimizationEvent.OnSelectInvestmentVariant -> {
                 val workList = state.workList.toMutableList()
                 val map = state.plotInfoList[event.index].investmentMap
                 workList.forEach {
@@ -60,39 +58,55 @@ class OptimizationViewModel : ViewModel() {
                     it.invested =
                         value.also { Log.d("viewModel", value.toString()) }
                 }
-                state = state.copy(workList = workList, isPlotVisible = false, selectedVariant = event.index)
+                state = state.copy(
+                    workList = workList,
+                    isPlotVisible = false,
+                    selectedVariant = event.index
+                )
+                state = state.copy(workCostsMonteCarlo = workList.map {
+                    Triple(
+                        null,
+                        it.durationPessimistic!! - it.invested/it.costToSpeedUp!!,
+                        null
+                    )
+                })
+            }
+            OptimizationEvent.OnChooseMonteCarloMode -> {
+                state = state.copy(isMonteCarlo = true)
+            }
+            OptimizationEvent.OnBuildMonteCarloPlot -> {
+                //TODO
+            }
+            is OptimizationEvent.OnEditMonteCarlo -> {
+                val monteCarloList = state.workCostsMonteCarlo.toMutableList()
+                monteCarloList[event.index] = event.value
+                state = state.copy(workCostsMonteCarlo = monteCarloList)
             }
         }
     }
-    private fun optimize(){
+
+    private fun optimize() {
         val benefit = state.benefitForOneDay
-        if(benefit!=null) {
+        if (benefit != null) {
             viewModelScope.launch {
                 val graph = GraphBuilder2(state.workList)
                 val calculator =
                     GraphCalculations(myEdges = graph.myEdges, nodes = graph.myNodes)
                 val calc2 = GraphCalculations2(graphCalculations = calculator, graph)
-//                        val map = calc2.firstOptimization(benefit)
-//                        val workList = state.workList
-//                        Log.d("viewModel",map.toString())
-//                        workList.forEach {
-//                            val value =  map[it.name] ?: 0
-//                            it.invested = value.also { Log.d("viewModel",value.toString()) }
-//                        }
-//                        state = state.copy(workList = workList)
-
                 val plotList = calc2.getOptimizationGraphic2(benefit)
                 val chartEntryModel = entryModelOf(
-                     *(plotList.map { Pair(it.days,it.cost) }.toTypedArray())
+                    *(plotList.map { Pair(it.days, it.cost) }.toTypedArray())
                 )
                 plotList.forEach {
-                    Log.d("viewModel","${it.days} ${it.cost}")
+                    Log.d("viewModel", "${it.days} ${it.cost}")
                 }
-
-                state =state.copy(plotInfoList=plotList, plotModel = chartEntryModel, isPlotVisible = true)
-//                calc2.getOptimizationGraphic2(10)
+                state = state.copy(
+                    plotInfoList = plotList,
+                    plotModel = chartEntryModel,
+                    isPlotVisible = true
+                )
             }
-        }else{
+        } else {
             viewModelScope.launch {
                 _uiEvent.send(UiEvent.Message("Заполните поле с выгодой"))
             }

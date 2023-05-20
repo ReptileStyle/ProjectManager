@@ -12,4 +12,10 @@ sealed class OptimizationEvent {
 
     data class OnSelectInvestmentVariant(val index:Int):OptimizationEvent()
 
+    object OnChooseMonteCarloMode:OptimizationEvent()
+
+    object OnBuildMonteCarloPlot:OptimizationEvent()
+
+    data class OnEditMonteCarlo(val index: Int,val value:Triple<Int?,Int,Int?>):OptimizationEvent()
+
 }

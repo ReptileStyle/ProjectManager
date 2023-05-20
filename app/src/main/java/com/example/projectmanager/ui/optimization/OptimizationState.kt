@@ -10,5 +10,7 @@ data class OptimizationState(
     val plotInfoList:List<PlotInfo1> = listOf(),
     val selectedVariant:Int? =null,
     val plotModel:ChartEntryModel? = null,
-    val isPlotVisible:Boolean = false
+    val isPlotVisible:Boolean = false,
+    val isMonteCarlo:Boolean = false,
+    val workCostsMonteCarlo:List<Triple<Int?,Int,Int?>> = listOf()
 )

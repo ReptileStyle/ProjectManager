@@ -87,107 +87,27 @@ class GraphCalculations2(
         return map
     }
 
-    fun getOptimizationGraphic(benefitOneDay: Int): List<PlotInfo1> {
-        val list: MutableList<PlotInfo1> = mutableListOf()
-        val map = firstOptimization(benefitOneDay).toMutableMap()
-        graphCalculations.recalculateReservedTimes(1)
-        list.add(
-            PlotInfo1(
-                days = graphCalculations.getEarlyTimeOfLastEvent(),
-                cost = graphCalculations.getEarlyTimeOfLastEvent() * benefitOneDay + map.map { it.value }
-                    .sum(),
-                investmentMap = map.toMap()
-            )
-        )
-        while (true) {
-            val result = optimizeByOneDay()
-
-            if (result.first == Int.MAX_VALUE) break
-            result.second.forEach {
-                if (map.containsKey(it.name)) {
-                    map[it.name] = map[it.name]!! + it.costToSpeedUp!!
-                } else {
-                    map[it.name] = it.costToSpeedUp!!
-                }
-            }
-            graphCalculations.edgeData.forEach {
-                it.invested = map[it.work.name] ?: 0
-            }
-            graphCalculations.recalculateReservedTimes(1)
-
-            Log.d(
-                "crits",
-                "${graphCalculations.getEarlyTimeOfLastEvent()} \n ${
-                    graphCalculations.getAllCriticalPaths().toString()
-                }"
-            )
-            list.add(
-                PlotInfo1(
-                    days = graphCalculations.getEarlyTimeOfLastEvent(),
-                    cost = graphCalculations.getEarlyTimeOfLastEvent() * benefitOneDay + map.map { it.value }
-                        .sum(),
-                    investmentMap = map.toMap()
-                )
-            )
-//            graphCalculations.recalculateReservedTimes(1)
-
-//            graphCalculations.calculateEarlyTimes(1)
-        }
-        return list
-    }
 
     fun GraphCalculations.getEarlyTimeOfLastEvent(): Int {
         return this.nodeData.maxBy { it.earlyTime ?: 0 }.earlyTime!!
     }
 
-    fun GraphCalculations.getAllCriticalPaths(): List<List<Pair<Int, Int>>> {
-        val lastEvent = this.nodeData.maxBy { it.earlyTime ?: 0 }
-        fun helperFun(edgeData: EdgeData): List<List<Pair<Int, Int>>> {
-            if (edgeData.src.dstEdges.isEmpty()) return listOf(
-                listOf(
-                    Pair(
-                        edgeData.src.number,
-                        edgeData.dst.number
-                    )
-                )
-            ) //return if first event
-            val list: MutableList<List<Pair<Int, Int>>> = mutableListOf()
-            edgeData.src.dstEdges.filter { it.reservedTimeOptimization == 0 }.forEach {
-                list.addAll(helperFun(it).map {
-                    it.plus(
-                        Pair(
-                            edgeData.src.number,
-                            edgeData.dst.number
-                        )
-                    )
-                })
-            }
-            return list
-        }
-
-        val list: MutableList<List<Pair<Int, Int>>> = mutableListOf()
-        lastEvent.dstEdges.filter { it.reservedTimeOptimization == 0 }.forEach {
-            list.addAll(helperFun(it))
-        }
-        return list
-    }
 
     fun GraphCalculations.getCriticalPathsGraph(): SimpleDirectedWeightedGraph<Int, DefaultWeightedEdge> {
-        graphCalculations.recalculateReservedTimes(1)
+        this.recalculateReservedTimes(1)
         val graph =
             SimpleDirectedWeightedGraph<Int, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
-        val lastEvent = this.nodeData.maxBy { it.earlyTime ?: 0 }
-        graphCalculations.nodeData.forEach {
+        this.nodeData.forEach {
             graph.addVertex(it.number)
         }
-        graphCalculations.edgeData.filter { it.reservedTimeOptimization == 0 }
+        this.edgeData.filter { it.reservedTimeOptimization == 0 }
             .forEach { edge ->
                 val weightedEdge = DefaultWeightedEdge()
                 graph.addEdge(edge.src.number, edge.dst.number, weightedEdge)
                 Log.d("newgraphcalc","${edge.work.name},${edge.invested},${edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp!! != edge.work.durationOptimistic} ")
                 graph.setEdgeWeight(
                     weightedEdge,
-                    if (edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp!! != edge.work.durationOptimistic)
+                    if (edge.work.durationPessimistic!! - edge.invested / edge.work.costToSpeedUp != edge.work.durationOptimistic)
                         edge.speedUpCost.toDouble() else Int.MAX_VALUE.toDouble(),
                 )
             }
@@ -209,7 +129,6 @@ class GraphCalculations2(
                 Int.MAX_VALUE
             )
         val edgesToCheck: MutableSet<DefaultWeightedEdge> = mutableSetOf()
-        val minimumCost = Int.MAX_VALUE
         allPaths.forEach {
             edgesToCheck.addAll(it.edgeList)
         }//create default set of edges to check

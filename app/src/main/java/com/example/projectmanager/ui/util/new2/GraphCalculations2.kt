@@ -217,8 +217,8 @@ class GraphCalculations2(
         return list
     }
 
-    private val betaAlpha = 3 + sqrt(2.0)
-    private val betaBeta = 3 - sqrt(2.0)
+    private val betaAlpha = 3 - sqrt(2.0)
+    private val betaBeta = 3 + sqrt(2.0)
     fun GraphCalculations.getEarlyTimeMonteCarloOfLastEvent(): Double {
         return this.nodeData.maxBy { it.earlyTimeMonteCarlo ?: 0.0 }.earlyTimeMonteCarlo!!
     }
@@ -227,10 +227,13 @@ class GraphCalculations2(
         //generating sample
         val projectDurations = mutableListOf<Double>()
 
-        for (i in 1..1000) {
+        for (i in 1..10000) {
             val workDurations: MutableMap<String, Double> = mutableMapOf()
             monteCarloInfo.forEach {
-                workDurations[it.name] = it.duration.toDouble() + it.width!! * (BetaDistribution(betaAlpha,betaBeta).sample() - 0.85355339)
+                workDurations[it.name] = it.duration.toDouble() + it.width!! * (BetaDistribution(
+                    betaAlpha,
+                    betaBeta
+                ).sample().also { Log.d("asd", it.toString()) } - 0.3592455) //0.85355339
             } //вычесть моду распределения
             graphCalculations.nodeData.forEach {
                 it.earlyTimeMonteCarlo = null
@@ -239,7 +242,9 @@ class GraphCalculations2(
                 edge.monteCarloDuration = workDurations[edge.name] ?: 0.0
             }
             graphCalculations.calculateMonteCarloEarlyTime()
-            projectDurations.add(graphCalculations.getEarlyTimeMonteCarloOfLastEvent().also { Log.d("generator",it.toString()) })
+            projectDurations.add(
+                graphCalculations.getEarlyTimeMonteCarloOfLastEvent()
+                    .also { Log.d("generator", it.toString()) })
         }
         val rounded = projectDurations.map {
             it.roundToInt()
@@ -248,8 +253,8 @@ class GraphCalculations2(
         rounded.forEach {
             countMap[it] = (countMap[it] ?: 0) + 1
         }
-        Log.d("calc2",rounded.toString())
-        return countMap.toList().map { Pair(it.first,it.second.toDouble()/1000.0) }
+        Log.d("calc2", rounded.toString())
+        return countMap.toList().map { Pair(it.first, it.second.toDouble() / 10000.0) }
     }
 
 

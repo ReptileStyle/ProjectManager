@@ -68,7 +68,7 @@ class OptimizationViewModel : ViewModel() {
                     MonteCarloWork(
                         name=it.name,
                         it.durationPessimistic!! - it.invested/it.costToSpeedUp!!,
-                        5.0
+                        6.0
                     )
                 })
             }
